@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>VR Systems Guide</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <style>body { margin: 0; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <!-- Attachment point for your app -->
+    <div id="initialize">
+      <div id="placeHolder">
+        <div style="background-image:url('https://images.unsplash.com/photo-1493497029755-f49c8e9a8bbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1489&q=80');height:50%;background-position:center;background-repeat: no-repeat;background-size: cover;"></div>
+        <div class="container px-md-3 px-sm-0">
+          <div class="col-md-12 mb-4 white-text text-center wow fadeIn">
+            <h3 class="display-3 font-weight-bold white-text mb-0 pt-md-5 pt-5">VR Systems Guide</h3>
+            <hr>
+            <h4 class="subtext-header mt-2 mb-4">Browse through most popular Head Mounted Displays for VR either in desktop or headset.</h4>
+            <h4 class="subtext-header mt-2 mb-4">Watch promotional videos and compare various technical specifications such as resolution, field of view, panel type, and refresh rate.</h4>
+            <h4 class="subtext-header mt-2 mb-4">Click Enter to Begin.</h4>
+            <button type="button" class="btn btn-dark" onClick="enterApp();">Enter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./client.bundle?platform=vr"></script>
+    <script>
+      // Initialize the React 360 application
+      function enterApp() {
+        React360.init(
+          'index.bundle?platform=vr&dev=true',
+          document.getElementById('initialize'),
+          {
+            assetRoot: 'static_assets/',
+          }
+        );
+
+        const elem = document.getElementById('placeHolder');
+        elem.parentNode.removeChild(elem);
+      }
+    </script>
+  </body>
+</html>
