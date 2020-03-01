@@ -28,7 +28,7 @@ class RightPanel extends React.Component {
   };
 
   fetchCryptoData(crypto) {
-    fetch(`https://min-api.cryptocompare.com/data/coin/generalinfo?fsyms=${crypto}&tsym=USD&api_key=1bd0917187334c260db80edb86b250d88a7fe2c3721153a3467742137b6499ba`)
+    fetch(`https://min-api.cryptocompare.com/data/coin/generalinfo?fsyms=${crypto}&tsym=USD&api_key=`)
       .then(response => response.json())
       .then(data => this.setState({
         cryptoData: {
