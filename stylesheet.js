@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   textSize: {
-    fontSize: 20,
+    fontSize: 19,
     textAlign: 'center'
   },
   infoHeader: {
@@ -56,8 +56,35 @@ export const styles = StyleSheet.create({
     borderColor: 'rgb(255,255,255)',
     borderWidth: 2.5
   },
+  buttonCenter: {
+    height: 50,
+    width: 225,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    backgroundColor: '#0EB1D2',
+    borderColor: 'rgb(255,255,255)',
+    borderWidth: 2.5
+  },
+  buttonRate: {
+    height: 30,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    backgroundColor: '#0EB1D2',
+    borderColor: 'rgb(255,255,255)',
+    borderWidth: .5,
+    marginBottom: 5
+  },
   hover: {
     height: 60,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    backgroundColor: '#0073B7',
+    borderColor: 'rgb(255,255,255)',
+    borderWidth: 2.5,
+  },
+  hoverCenter: {
+    height: 50,
+    width: 225,
     flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: '#0073B7',

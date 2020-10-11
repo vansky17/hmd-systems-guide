@@ -1,4 +1,5 @@
 import React from 'react';
+import config from './config';
 import {
   Animated,
   asset,
@@ -8,43 +9,37 @@ import {
   View,
   VrButton
 } from 'react-360';
-import { connect, nextCrypto } from './store';
+import { connect, nextHmd, prevHmd } from './store';
 import styles from './stylesheet';
 
 const { AudioModule } = NativeModules;
 
 class CenterPanel extends React.Component {
   state = {
-    cryptoData: {
-      symbol: '',
-      algorithm: '',
-      proofType: '',
-      blockNumber: '',
-      blockTime: '',
-      blockReward: ''
-    },
+    name: '',
+    image: '',
+    id: 1,
     hover: false,
     fade: new Animated.Value(0)
   };
 
-  fetchCryptoData(crypto) {
-    fetch(`https://min-api.cryptocompare.com/data/coin/generalinfo?fsyms=${crypto}&tsym=USD&api_key=`)
-      .then(response => response.json())
-      .then(data => this.setState({
-        cryptoData: {
-          symbol: data["Data"][0]["CoinInfo"]["Name"],
-          algorithm: data["Data"][0]["CoinInfo"]["Algorithm"],
-          proofType: data["Data"][0]["CoinInfo"]["ProofType"],
-          blockNumber: data["Data"][0]["CoinInfo"]["BlockNumber"],
-          blockTime: data["Data"][0]["CoinInfo"]["BlockTime"],
-          blockReward: data["Data"][0]["CoinInfo"]["BlockReward"]
-        }
-      })
-    )
+  fetchHmdData(index) {
+    fetch(`${config.API_ENDPOINT}/hmds`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      data.sort((a, b) => parseFloat(a.id) - parseFloat(b.id));
+     this.setState({
+      name: data[index].name,
+      image: data[index].image,
+      id: data[index].id
+     });
+
+    });  
   }
 
   componentDidMount() {
-    this.fetchCryptoData(this.props.crypto);
+    this.fetchHmdData(0);
 
     Animated.timing(
       this.state.fade,
@@ -56,16 +51,24 @@ class CenterPanel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.crypto !== this.props.crypto) {
-      this.fetchCryptoData(this.props.crypto);
+    if (prevProps.index !== this.props.index) {
+      this.fetchHmdData(this.props.index);
     }
   }
   clickHandler(index) {
-    nextCrypto(index)
+    nextHmd(index)
 
     AudioModule.playOneShot({
-      source: asset('audio/click.wav'),
-      volume: 0.1
+      source: asset('audio/next.wav'),
+      volume: 0.4
+    });
+  }
+  clickHandlerPrev(index) {
+    prevHmd(index)
+
+    AudioModule.playOneShot({
+      source: asset('audio/next.wav'),
+      volume: 0.4
     });
   }
   render () {
@@ -73,18 +76,24 @@ class CenterPanel extends React.Component {
     return(
       <Animated.View style={[{opacity: fade}, styles.centerPanel]}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Vive Cosmos</Text>
+    <Text style={styles.headerText}>{this.state.name}</Text>
         </View>
         <View>
-         <Image source={{uri: 'https://userdocsmanager.s3.us-east-2.amazonaws.com/cosmos.jpg'}}  style={{width:460, height: 250}}></Image>
+         <Image source={{uri: 'https://userdocsmanager.s3.us-east-2.amazonaws.com/'+this.state.image}}  style={{width:460, height: 250}}></Image>
         </View>
-        <View>
-          <VrButton style={this.state.hover ? styles.hover : styles.button}
+        <View style={{flexDirection:"row"}}>
+          <VrButton style={ this.state.hover ? styles.hoverCenter :  styles.buttonCenter}
+                      onEnter={() => this.setState({hover: true})}
+                      onExit={() => this.setState({hover: false})}
+                      onClick={() => this.clickHandlerPrev(this.props.index)}>
+              <Text style={styles.textSize}>PREV</Text>
+          </VrButton>
+          <VrButton style={this.state.hover ? styles.hoverCenter : styles.buttonCenter}
                     onEnter={() => this.setState({hover: true})}
                     onExit={() => this.setState({hover: false})}
                     onClick={() => this.clickHandler(this.props.index)}>
-            <Text style={styles.textSize}>Next</Text>
-          </VrButton>
+            <Text style={styles.textSize}>NEXT / {this.props.index +1} of 9</Text>
+          </VrButton>  
         </View>
       </Animated.View>
     );

@@ -41,7 +41,7 @@ export class CryptoModel extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.crypto !== nextProps.crypto) {
+    if (this.props.hmd !== nextProps.hmd) {
       const cryptoConfig = {
         value: this.state.bounceValue,
         initial: 0.3,
@@ -83,11 +83,11 @@ export class CryptoModel extends React.Component {
           style={{transform: [{scaleX: this.state.bounceValue},
                               {scaleY: this.state.bounceValue},
                               {scaleZ: this.state.bounceValue},
-                              {rotateX: this.rotations[`${this.props.crypto}`].rotateX},
-                              {rotateY: this.rotations[`${this.props.crypto}`].rotateY},
-                              {rotateZ: this.rotations[`${this.props.crypto}`].rotateZ}
+                              {rotateX: this.rotations[`${this.props.hmd}`].rotateX},
+                              {rotateY: this.rotations[`${this.props.hmd}`].rotateY},
+                              {rotateZ: this.rotations[`${this.props.hmd}`].rotateZ}
                             ]}}
-          /* source={{obj: asset(`models/${this.props.crypto}.obj`), mtl: asset(`models/${this.props.crypto}.mtl`)}} */
+          /* source={{obj: asset(`models/${this.props.hmd}.obj`), mtl: asset(`models/${this.props.hmd}.mtl`)}} */
           source={{obj: asset(`models/BTC.obj`), mtl: asset(`models/BTC.mtl`)}}
         />
       </View>

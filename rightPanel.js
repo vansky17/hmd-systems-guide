@@ -1,4 +1,5 @@
 import React from 'react';
+import config from './config';
 import {
   Animated,
   asset,
@@ -8,43 +9,47 @@ import {
   View,
   VrButton
 } from 'react-360';
-import { connect, nextCrypto } from './store';
+import { connect, nextHmd } from './store';
 import styles from './stylesheet';
 
 const { AudioModule } = NativeModules;
 
 class RightPanel extends React.Component {
   state = {
-    cryptoData: {
-      symbol: '',
-      algorithm: '',
-      proofType: '',
-      blockNumber: '',
-      blockTime: '',
-      blockReward: ''
-    },
+    id: null,
+    panel: '',
+    resolution:'',
+    ppd: '',
+    refrate: '',
+    fov: '',
+    tracking: '',
+    price: '',
+    rating: '',
     hover: false,
     fade: new Animated.Value(0)
   };
 
-  fetchCryptoData(crypto) {
-    fetch(`https://min-api.cryptocompare.com/data/coin/generalinfo?fsyms=${crypto}&tsym=USD&api_key=`)
-      .then(response => response.json())
-      .then(data => this.setState({
-        cryptoData: {
-          symbol: data["Data"][0]["CoinInfo"]["Name"],
-          algorithm: data["Data"][0]["CoinInfo"]["Algorithm"],
-          proofType: data["Data"][0]["CoinInfo"]["ProofType"],
-          blockNumber: data["Data"][0]["CoinInfo"]["BlockNumber"],
-          blockTime: data["Data"][0]["CoinInfo"]["BlockTime"],
-          blockReward: data["Data"][0]["CoinInfo"]["BlockReward"]
-        }
-      })
-    )
+  fetchHmdData(index) {
+    fetch(`${config.API_ENDPOINT}/hmds`)
+    .then(response => response.json())
+    .then(data => {
+      data.sort((a, b) => parseFloat(a.id) - parseFloat(b.id));
+     this.setState({
+      id: data[index].id, 
+      panel: data[index].panel,
+      resolution: data[index].resolution,
+      ppd: data[index].ppd,
+      refrate: data[index].refrate,
+      fov: data[index].fov,
+      tracking: data[index].tracking,
+      price: data[index].price,
+      rating: data[index].rating
+     });
+    });  
   }
 
   componentDidMount() {
-    this.fetchCryptoData(this.props.crypto);
+    this.fetchHmdData(this.props.index);
 
     Animated.timing(
       this.state.fade,
@@ -56,16 +61,41 @@ class RightPanel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.crypto !== this.props.crypto) {
-      this.fetchCryptoData(this.props.crypto);
+    if (prevProps.index !== this.props.index) {
+      this.fetchHmdData(this.props.index);
     }
   }
-
-  clickHandler(index) {
-    nextCrypto(index)
-
+  _incrementCount = () => {
+    this.setState({rating: this.state.rating + 1});
+    if (this.state.rating >= 10){
+      this.setState({rating: 1});
+    }
     AudioModule.playOneShot({
       source: asset('audio/click.wav'),
+      volume: 0.1
+    });
+  };
+
+  clickHandler() {
+    const {rating} = this.state;
+    const newRating = {rating}
+    fetch(`${config.API_ENDPOINT}/hmds/${this.state.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(newRating),
+      headers: {
+        'content-type': 'application/json',
+      },
+    })
+    .then(res => {
+      if (!res.ok)
+        return res.json().then(error => Promise.reject(error))
+    })
+    .then(response => response.json())
+    .then(json => console.log(json));
+
+    AudioModule.playOneShot({
+      source: asset('audio/rate.wav'),
+      volume: 0.7
     });
   }
 
@@ -73,64 +103,41 @@ class RightPanel extends React.Component {
     let { fade } = this.state;
 
     return (
-      /* <Animated.View style={[{opacity: fade},styles.rightPanel]}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Information</Text>
-        </View>
-        <View>
-          <Text style={styles.textSize}>
-            Symbol: { this.state.cryptoData.symbol }
-          </Text>
-          <Text style={styles.textSize}>
-            Algorithm: { this.state.cryptoData.algorithm }
-          </Text>
-          <Text style={styles.textSize}>
-            Proof Type: { this.state.cryptoData.proofType }
-          </Text>
-          <Text style={styles.textSize}>
-            Block Number: { this.state.cryptoData.blockNumber }
-          </Text>
-          <Text style={styles.textSize}>
-            Block Time: { this.state.cryptoData.blockTime }
-          </Text>
-          <Text style={styles.textSize}>
-            Block Reward: { this.state.cryptoData.blockReward }
-          </Text>
-        </View>
-        <View> */
       <Animated.View style={[{opacity: fade},styles.rightPanel]}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Information</Text>
         </View>
         <View>
           <View>
-            <Image source={asset('lcd.png')} style={{width: 150, height: 75, marginLeft: 75}}></Image>
+            <Image source={this.state.panel==='lcd'? asset('lcd.png') : asset('oled.png')} style={{width: 150, height: 75, marginLeft: 75}}></Image>
           </View>
           <Text style={styles.textSize}>
-            Resolution: 2880 x 1700 
+            Resolution: {this.state.resolution}
           </Text>
           <Text style={styles.textSize}>
-            Pixels per Degree: 14
+            Pixels per Degree: {this.state.ppd}
           </Text>
           <Text style={styles.textSize}>
-            Refresh Rate: 90 Hz
+            Refresh Rate: {this.state.refrate}
           </Text>
           <Text style={styles.textSize}>
-            Field of View: 110°
+            Field of View: {this.state.fov}
           </Text> 
           <Text style={styles.textSize}>
-            Tracking: Inside-Out/Base Staions
+            Tracking: {this.state.tracking}
           </Text>
           <Text style={styles.textSize}>
-            Price: $699/$799/$999
+            Price: {this.state.price}
           </Text>
         </View>
         <View>
-          <VrButton /* style={this.state.hover ? styles.hover : styles.button}
+          <Text >Rating: {this.state.rating}</Text>
+          <VrButton onClick={this._incrementCount} style={styles.buttonRate}><Text>Rate</Text></VrButton>
+          <VrButton style={this.state.hover ? styles.hover : styles.button}
                     onEnter={() => this.setState({hover: true})}
                     onExit={() => this.setState({hover: false})}
-                    onClick={() => this.clickHandler(this.props.index)} */>
-            <Text style={styles.textSize}>&nbsp;</Text>
+                    onClick={() => this.clickHandler()}>
+            <Text style={styles.textSize}>Save Rating</Text>
           </VrButton>
         </View>
       </Animated.View>

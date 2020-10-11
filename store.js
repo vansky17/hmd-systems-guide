@@ -1,7 +1,7 @@
 import React from 'react';
 
 const State = {
-  crypto: 'BTC',
+  hmd: 'BTC',
   index: 0
 };
 
@@ -13,45 +13,109 @@ function updateComponents() {
   }
 }
 
-export function nextCrypto(index) {
-  let cryptoIndex = index;
-  let cryptos = [{ crypto: 'BTC',
+export function nextHmd(index) {
+  let hmdIndex = index;
+  let hmds = [{ hmd: 'BTC',
                    index: 0
                  },
                  {
-                   crypto: 'DASH',
+                   hmd: 'DASH',
                    index: 1
                  },
-                 { crypto: 'XMR',
+                 { hmd: 'XMR',
                    index: 2
                  },
-                 { crypto: 'ZEN',
+                 { hmd: 'ZEN',
                    index: 3
-                 }];
+                 },
+                 { hmd: 'BTC',
+                   index: 4
+                },
+                {  hmd: 'BTC',
+                   index: 5
+                },
+                {  hmd: 'BTC',
+                   index: 6
+                },
+                {  hmd: 'BTC',
+                   index: 7
+                },
+                {  hmd: 'BTC',
+                   index: 8
+                },
+                {  hmd: 'BTC',
+                   index: 9
+                }
+              ];
 
 
-  if (index < 3) {
-    cryptoIndex = cryptoIndex + 1;
+  if (index < 8) {
+    hmdIndex = hmdIndex + 1;
   } else {
-    cryptoIndex = 0;
+    hmdIndex = 0;
   }
 
-  State.crypto = cryptos[cryptoIndex].crypto;
-  State.index = cryptos[cryptoIndex].index;
+  State.hmd = hmds[hmdIndex].hmd;
+  State.index = hmds[hmdIndex].index;
+  updateComponents();
+}
+export function prevHmd(index) {
+  let hmdIndex = index;
+  let hmds = [{ hmd: 'BTC',
+                   index: 0
+                 },
+                 {
+                   hmd: 'DASH',
+                   index: 1
+                 },
+                 { hmd: 'XMR',
+                   index: 2
+                 },
+                 { hmd: 'ZEN',
+                   index: 3
+                 },
+                 { hmd: 'BTC',
+                   index: 4
+                },
+                {  hmd: 'BTC',
+                   index: 5
+                },
+                {  hmd: 'BTC',
+                   index: 6
+                },
+                {  hmd: 'BTC',
+                   index: 7
+                },
+                {  hmd: 'BTC',
+                   index: 8
+                },
+                {  hmd: 'BTC',
+                   index: 9
+                }
+              ];
+
+
+  if (index <= 8) {
+    hmdIndex = hmdIndex - 1;
+  } else {
+    hmdIndex = 0;
+  }
+
+  State.hmd = hmds[hmdIndex].hmd;
+  State.index = hmds[hmdIndex].index;
   updateComponents();
 }
 
 export function connect(Component) {
   return class Wrapper extends React.Component {
     state = {
-      crypto: State.crypto,
+      hmd: State.hmd,
       index: State.index
     };
 
     _listener = () => {
       this.setState({
-        crypto: State.crypto,
-        /* cryptoSymbol: State.cryptoSymbol, */
+        hmd: State.hmd,
         index: State.index
       });
     };
@@ -64,7 +128,7 @@ export function connect(Component) {
       return (
         <Component
           {...this.props}
-          crypto={this.state.crypto}
+          hmd={this.state.hmd}
           index={this.state.index}
         />
       );

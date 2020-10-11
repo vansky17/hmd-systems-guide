@@ -1,4 +1,5 @@
 import React from 'react';
+import config from './config';
 import {
   asset,
   Animated,
@@ -13,38 +14,26 @@ import {VideoPlayer, VideoControl} from './src/VideoExtra'
 
 class LeftPanel extends React.Component {
   state = {
-    cryptocurrency: {
-      symbol: '',
-      time: '',
-      close: '',
-      high: '',
-      low: '',
-      open: '',
-      volumefrom: '',
-      volumeto: ''
-    },
+    video: '',
+    page: '',
     fade: new Animated.Value(0)
   };
 
-  fetchCryptoData(crypto) {
-    fetch(`https://min-api.cryptocompare.com/data/histoday?fsym=${crypto}&tsym=USD`)
+  fetchHmdData(index) {
+    fetch(`${config.API_ENDPOINT}/hmds`)
     .then(response => response.json())
     .then(data => {
-      this.setState({ cryptocurrency: {
-          open: data["Data"][30]["open"],
-          close: data["Data"][30]["close"],
-          high: data["Data"][30]["high"],
-          low: data["Data"][30]["low"],
-          volumefrom: data["Data"][30]["volumefrom"],
-          volumeto: data["Data"][30]["volumeto"]
-        }
-      });
-    })
+      data.sort((a, b) => parseFloat(a.id) - parseFloat(b.id));
+     this.setState({
+      video: data[index].video,
+      page: data[index].page
+     });
+    });
+    
   }
 
   componentDidMount() {
-    this.fetchCryptoData(this.props.crypto);
-
+    this.fetchHmdData(0);
     Animated.timing(
       this.state.fade,
       {
@@ -55,8 +44,8 @@ class LeftPanel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.crypto !== this.props.crypto) {
-      this.fetchCryptoData(this.props.crypto);
+    if (prevProps.index !== this.props.index) {
+      this.fetchHmdData(this.props.index);
     }
   }
 
@@ -67,20 +56,21 @@ class LeftPanel extends React.Component {
         <View style={{flex: 1, height: 600, borderColor: '#003459',
         borderWidth: 1}}>
           <View style={styles.header} style={{height: 125, backgroundColor: '#003459', opacity:0.5}}>
-            <Text style={styles.headerText}>Watch Video</Text>
+    <Text style={styles.headerText}>Watch Video</Text>
           </View>
           <VideoPlayer 
             muted={false}
             loop={true}
-            source={{url: 'https://userdocsmanager.s3.us-east-2.amazonaws.com/VIVECosmos.mp4'}}
+            source={{url:  this.state.video +'.mp4'}}
             stereo={'2D'}
-            volume = {0.1}
+            volume = {0.17}
             style={{
               width: 600,
               height: 350,
             }}
           />
           <View style={styles.header} style={{height: 125, backgroundColor: '#003459', opacity:0.5}}>
+            <Text href={this.state.page}>{this.state.page}</Text>
             <Text style={styles.headerText} ></Text>
           </View>
       </View>
